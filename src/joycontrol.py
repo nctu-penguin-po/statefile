@@ -18,24 +18,20 @@ def joyB_cb(data):
     joy_button_data = data.data
     right_sig = joy_button_data[0]
     front_sig = joy_button_data[2]
-    if right_sig%2 == 1:
+    if (right_sig >> 3)%2 == 1:
         state_data = 0
         pub1.publish(state_data)
-    elif (right_sig >> 2)%2 == 1:
-        state_data = state_data | 2
+    elif (right_sig >> 1)%2 == 1:
+        state_data = state_data ^ 1
         pub1.publish(state_data)
-    elif (front_sig >> 3)%2 == 1:
-        state_data = state_data | 1
+    elif right_sig%2 == 1:
+        state_data = state_data ^ 2
         pub1.publish(state_data)
-    elif (left_sig >> 3)%2 == 1:
-        joyK = joyK-joyKrate*10
-    front_sig = joy_button_data[2]
-    if (front_sig >> 2)%2 == 1:
-        autoSwitch = (autoSwitch+1)%2
-        pub3.publish(autoSwitch)
 
 rospy.init_node('state',anonymous=True)
 
 rospy.Subscriber('/joy/button', Int32MultiArray, joyB_cb)
 
 pub1 = rospy.Publisher('/state', Int32, queue_size=10)
+while not rospy.is_shutdown():
+    pass
