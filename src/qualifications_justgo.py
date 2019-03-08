@@ -15,7 +15,6 @@ state_data = 0
 start_tri_flag = 0
 reset_flag = 0
 finish_flag = 0
-turn_flag = [0, 0, 0, 0, 0]
 
 def voltage_cb(data):
     global state_data, start_tri_flag, reset_flag, finish_flag
@@ -35,17 +34,12 @@ def voltage_cb(data):
 def depth_cb(data):
     global depth_data
     depth_data = data.data
-    
-def turnflag_cb(data):
-    global turn_flag
-    turn_flag = data.data
 
 rospy.init_node('state',anonymous=True)
 pub1 = rospy.Publisher('/state',Int32,queue_size=10)
 
 rospy.Subscriber('/voltage', Float32, voltage_cb)
 rospy.Subscriber('/depth', Float32, depth_cb)
-rospy.Subscriber('/flag/PIDturn', Int32MultiArray, turnflag_cb)
 
 while not rospy.is_shutdown():
     if start_tri_flag == 1:
@@ -65,8 +59,7 @@ while not rospy.is_shutdown():
     elif state_data == 3 and depth_data > 0.55:
         state_data = 15
         pub1.publish(15)
-    elif state_data == 15 and turn_flag[3] == 1:
-        for i in range(10):
+        for i in range(40):
             time.sleep(1)
             if reset_flag == 1:
                 reset_flag = 0
